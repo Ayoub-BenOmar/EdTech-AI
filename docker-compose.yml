@@ -1,0 +1,16 @@
+services:
+  db:
+    image: pgvector/pgvector:pg18
+    container_name: edtech-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: edtech_ai
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
