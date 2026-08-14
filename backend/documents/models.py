@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from pgvector.django import VectorField
 
 
 class Document(models.Model):
@@ -57,6 +58,12 @@ class DocumentChunk(models.Model):
     chunk_index = models.PositiveIntegerField()
 
     page_number = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+    )
+
+    embedding = VectorField(
+        dimensions=384,
         null=True,
         blank=True,
     )
