@@ -17,7 +17,7 @@ services:
       retries: 10
 
   minio:
-    image: minio/minio
+    image: cgr.dev/chainguard/minio
     container_name: edtech-minio
     restart: unless-stopped
     command: server /data --console-address ":9001"
@@ -29,13 +29,25 @@ services:
       - "9001:9001" # web console
     volumes:
       - minio_data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
+  # Chainguard minio-client has no shell and runs as nonroot.
+  # We use the MC_HOST_<alias> env var so mc never needs to write a config file.
+  # Format: MC_HOST_<alias>=http://USER:PASSWORD@HOST:PORT
   minio-init:
-    image: minio/mc
+    image: cgr.dev/chainguard/minio-client
     depends_on:
-      - minio
-    entrypoint: >
-      /bin/sh -c " until mc alias set local http://minio:9000 minioadmin minioadmin; do sleep 1; done; mc mb --ignore-existing local/documents; mc anonymous set none local/documents; "
+      minio:
+        condition: service_healthy
+    environment:
+      MC_HOST_local: http://minioadmin:minioadmin@minio:9000
+    entrypoint: mc
+    command: mb --ignore-existing local/documents
+    restart: on-failure
 
   redis:
     image: redis:7-alpine
