@@ -5,7 +5,7 @@ from pgvector.django import VectorField
 
 class Document(models.Model):
     STATUS_CHOICES = [
-        ("PENDING", "Pending"),
+        ("UPLOADED", "Uploaded"),
         ("PROCESSING", "Processing"),
         ("READY", "Ready"),
         ("FAILED", "Failed"),
@@ -26,7 +26,7 @@ class Document(models.Model):
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
-        default="PENDING",
+        default="UPLOADED",
     )
 
     uploaded_at = models.DateTimeField(
